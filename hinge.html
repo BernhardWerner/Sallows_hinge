@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    
+    <title>Construction.cdy</title>
+    <style type="text/css">
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #CSConsole {
+            background-color: #FAFAFA;
+            border-top: 1px solid #333333;
+            bottom: 0px;
+            height: 200px;
+            overflow-y: scroll;
+            position: fixed;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cindyjs.org/dist/v0.8/CindyJS.css">
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
+<script id="csinit" type="text/x-cindyscript">
+blue = [(48,110,171),  (12,90,166),   (9,69,128)] / 255;
+orange = [(255,166,57),  (255,140,0),   (197,108,0)] / 255;
+teal = [(24,156,146),  (0,128,119),   (0,95,88)] / 255;
+
+A.color = blue_2;
+B.color = orange_2;
+C.color = teal_2;
+
+center() := (A+B+C)/3;
+
+rotation(alpha) := [[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]];
+rotate(v, alpha) := rotation(alpha) * v;
+rotateAround(p, c, alpha) := c + rotate(p - c, alpha);
+
+angleBetween(u, v) := arctan2(v) - arctan2(u);
+angleAt(p, q, r) := angleBetween(p - q, r - q);
+
+
+totalProgress() := dist(E,D) / dist(F,D);
+hingeProgress() := min(1, 2 * totalProgress());
+moveProgress() := max(0, 2 * totalProgress() - 1);
+
+lerp(x,y,t) := x + t * (y - x);
+
+
+
+update() := (
+goal = [dist(center(), (A + B) / 2), 0];
+
+
+
+hinge1 = (A + B) / 2;
+hinge2 = (B + C) / 2;
+hinge3 = (C + A) / 2;
+
+a1 = rotateAround(A, hinge1, hingeProgress() * pi / 2);
+a2 = rotateAround(A, hinge3, -hingeProgress() * pi / 2);
+b1 = rotateAround(B, hinge2, hingeProgress() * pi / 2);
+b2 = rotateAround(B, hinge1, -hingeProgress() * pi / 2);
+c1 = rotateAround(C, hinge3, hingeProgress() * pi / 2);
+c2 = rotateAround(C, hinge2, -hingeProgress() * pi / 2);
+
+
+tip1 = rotateAround(center(), hinge1, hingeProgress() * pi / 2);
+tip2 = rotateAround(center(), hinge1, -hingeProgress() * pi / 2);
+tip3 = rotateAround(center(), hinge2, hingeProgress() * pi / 2);
+tip4 = rotateAround(center(), hinge2, -hingeProgress() * pi / 2);
+tip5 = rotateAround(center(), hinge3, hingeProgress() * pi / 2);
+tip6 = rotateAround(center(), hinge3, -hingeProgress() * pi / 2);
+
+
+
+center1 = (a1 + tip1 + tip2) / 3;
+offset1 = lerp((0,0), center() - center1, moveProgress());
+
+center2 = (b1 + tip3 + tip4) / 3;
+offset2 = lerp((0,0), center() - center2, moveProgress());
+
+center3 = (c1 + tip5 + tip6) / 3;
+offset3 = lerp((0,0), center() - center3, moveProgress());
+
+
+);
+;
+</script>
+<script id="csdraw" type="text/x-cindyscript">
+update();
+
+fillpoly([a1 + offset1, hinge1 + offset1, tip1 + offset1], color -> teal_1, alpha -> lerp(1, 0.33, moveProgress()));
+fillpoly([b2 + offset1, hinge1 + offset1, tip2 + offset1], color -> teal_3, alpha -> lerp(1, 0.33, moveProgress()));
+fillpoly([b1 + offset2, hinge2 + offset2, tip3 + offset2], color -> blue_1, alpha -> lerp(1, 0.33, moveProgress()));
+fillpoly([c2 + offset2, hinge2 + offset2, tip4 + offset2], color -> blue_3, alpha -> lerp(1, 0.33, moveProgress()));
+fillpoly([c1 + offset3, hinge3 + offset3, tip5 + offset3], color -> orange_1, alpha -> lerp(1, 0.33, moveProgress()));
+fillpoly([a2 + offset3, hinge3 + offset3, tip6 + offset3], color -> orange_3, alpha -> lerp(1, 0.33, moveProgress()));
+</script>
+    <script type="text/javascript">
+var cdy = CindyJS({
+  scripts: "cs*",
+  defaultAppearance: {
+    dimDependent: 1.0,
+    fontFamily: "sans-serif",
+    lineSize: 1,
+    pointSize: 5.0,
+    textsize: 12.0
+  },
+  angleUnit: "°",
+  geometry: [
+    {name: "A", type: "Free", pos: [4.0, -0.138610817423842, 0.3686461982348036], dimDependent: 1, color: [0.047, 0.353, 0.651], textsize: 20.0},
+    {name: "B", type: "Free", pos: [4.0, 2.9559074569537653, 0.3694801879988536], dimDependent: 1, color: [1.0, 0.549, 0.0], textsize: 20.0},
+    {name: "C", type: "Free", pos: [4.0, 2.12247261762256, 1.2095359651762998], dimDependent: 1, color: [0.0, 0.502, 0.467], textsize: 20.0},
+    {name: "D", type: "Free", pos: [4.0, 1.9047619047619047, 0.19047619047619047], color: [1.0, 1.0, 1.0], pinned: true, textsize: 20.0},
+    {name: "F", type: "Free", pos: [4.0, -0.38095238095238093, 0.19047619047619047], color: [1.0, 1.0, 1.0], pinned: true, textsize: 20.0},
+    {name: "a", type: "Segment", color: [0.0, 0.0, 0.0], args: ["D", "F"]},
+    {name: "E", type: "PointOnSegment", pos: [4.0, 1.9047619047619049, 0.1904761904761905], color: [0.0, 0.0, 0.0], args: ["a"], textsize: 20.0}
+  ],
+  ports: [{
+    id: "CSCanvas",
+    width: 1084,
+    height: 681,
+    transform: [{visibleRect: [-3.073047181728563, 12.37195566130995, 23.476008508251393, -4.3069252656977515]}],
+    background: "rgb(255,255,255)"
+  }],
+  csconsole: false,
+  cinderella: {build: 2008, version: [3, 0, 2008]}
+});
+    </script>
+</head>
+<body>
+    <div id="CSCanvas"></div>
+</body>
+</html>
